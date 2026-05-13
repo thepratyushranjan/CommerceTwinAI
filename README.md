@@ -31,16 +31,16 @@ An integrated, multimodal AI suite that empowers sellers with instant, high-conv
 
 ## 🏗️ Architecture
 
-**Content Generator (Module 1):** The pipeline is triggered by an image upload. We utilize `gemini-2.5-pro` with a strict JSON schema to perform a highly factual visual analysis of the product. The resulting JSON attributes are then passed into `gemini-2.5-flash` to draft the SEO and marketing copy. Simultaneously, a dynamic prompt is built from those visual attributes and sent to the Pollinations.ai image generation API. We use Python's `concurrent.futures` to run the text generation and image generation in parallel. Finally, Pillow (PIL) is used to composite the generated product title over the banner image.
+**Content Generator (Module 1):** The pipeline is triggered by an image upload. We utilize `LLM` with a strict JSON schema to perform a highly factual visual analysis of the product. The resulting JSON attributes are then passed into `LLM` to draft the SEO and marketing copy. Simultaneously, a dynamic prompt is built from those visual attributes and sent to the Pollinations.ai image generation API. We use Python's `concurrent.futures` to run the text generation and image generation in parallel. Finally, Pillow (PIL) is used to composite the generated product title over the banner image.
 
-**Customer Support Agent (Module 2):** This module relies on a LangGraph ReAct (Reasoning and Acting) architecture powered by `gemini-2.5-flash`. The agent is given access to three distinct tools: a SQL querying tool (`get_order_status`), a RAG semantic search tool (`search_knowledge_base`), and a ticketing tool (`escalate_to_human`). When a user sends a message, the LLM enters a loop where it reasons about the user's intent, executes the necessary tools (often chaining them together, like looking up an order *then* checking the return policy), and finally synthesizes the tool outputs into a conversational response.
+**Customer Support Agent (Module 2):** This module relies on a LangGraph ReAct (Reasoning and Acting) architecture powered by `LLM`. The agent is given access to three distinct tools: a SQL querying tool (`get_order_status`), a RAG semantic search tool (`search_knowledge_base`), and a ticketing tool (`escalate_to_human`). When a user sends a message, the LLM enters a loop where it reasons about the user's intent, executes the necessary tools (often chaining them together, like looking up an order *then* checking the return policy), and finally synthesizes the tool outputs into a conversational response.
 
 ## 🚀 Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/thepratyushranjan/CommerceTwinAI.git
-cd ai-assistant-platform
+cd CommerceTwinAI
 
 # Create and activate a virtual environment
 python -m venv venv
@@ -63,8 +63,7 @@ streamlit run app.py
 
 ## 🎥 Demo
 
-*(Add link to 60-90 second Loom/YouTube demo here)*
-[Watch the Demo Video]()
+[Watch the Demo Video](https://drive.google.com/file/d/17S22EwTDxkrvEb-LRhi-TYOeAVHB3oW2/view?usp=sharing)
 
 ## 📂 Project Structure
 
@@ -126,3 +125,19 @@ By forcing the vision model to adhere to a strict JSON schema (e.g., `primary_co
 * **Human-in-the-Loop Escalation UI:** Build a third Streamlit page for "Support Managers" to view and resolve the tickets generated in `tickets.json`.
 * **Dynamic Tool Selection:** Implement an embedding-based tool retriever for the agent. If the toolset grows to 50+ tools, passing all of them in the prompt becomes too expensive.
 * **User Authentication:** Add session state login so users don't have to type their email or Order ID; the agent would automatically know who they are via context.
+
+## 📸 Screenshots
+
+![Screenshot 1](assets/screenshots/1.png)
+![Screenshot 2](assets/screenshots/2.png)
+![Screenshot 3](assets/screenshots/3.png)
+![Screenshot 4](assets/screenshots/4.png)
+![Screenshot 5](assets/screenshots/5.png)
+![Screenshot 6](assets/screenshots/6.png)
+![Screenshot 7](assets/screenshots/7.png)
+![Screenshot 8](assets/screenshots/8.png)
+![Screenshot 9](assets/screenshots/9.png)
+![Screenshot 10](assets/screenshots/10.png)
+![Screenshot 11](assets/screenshots/11.png)
+![Screenshot 12](assets/screenshots/12.png)
+![Screenshot 13](assets/screenshots/13.png)
