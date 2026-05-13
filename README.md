@@ -1,49 +1,45 @@
 # AI Assistant Platform for E-commerce
 
-An integrated AI-powered suite designed to streamline e-commerce operations. 
+An integrated, multimodal AI suite that empowers sellers with instant, high-converting marketing content and provides customers with an intelligent, agentic support experience.
 
-**Current Status:** ✅ Phase 1 Complete (Content Generator). Phase 2 (Customer Support Agent) is pending.
+*(Note: Architecture diagram and Demo video placeholders below. Please add screenshots to `/assets/` before submission)*
+![Architecture Diagram](assets/architecture_diagram.png)
 
 ## ✨ Features
 
-### 📸 Content Generator (Completed - Task 2)
-Transform raw product images into complete, high-converting marketing packages instantly.
-* **Multimodal Vision Analysis:** Automatically extracts product categories, materials, colors, and stylistic attributes using `gemini-2.5-pro`.
-* **SEO & Marketing Copy:** Generates SEO-optimized titles, engaging descriptions, and feature bullet points using `gemini-2.5-flash`.
-* **Social Media Kits:** Creates targeted Instagram and Twitter/X captions with relevant hashtags.
-* **Automated Banner Design:** Generates 16:9 promotional banners matching the product's aesthetic, complete with professional text overlays.
+### 📸 Content Generator (Task 2)
+* **Multimodal Vision Analysis:** Accurately extracts product materials, colors, and stylistic categories from raw images.
+* **SEO & Marketing Copy:** Generates highly targeted titles, bulleted features, and engaging product descriptions.
+* **Automated Banner Design:** Programmatically generates 16:9 promotional banners via Pollinations.ai with professional text overlays.
+* **Concurrent Generation:** Executes text copywriting and image rendering in parallel, cutting user wait time in half.
 
-### 🤖 Customer Support Agent (Pending - Task 1)
-* *Planned:* Agentic chatbot handling customer inquiries using RAG (ChromaDB) and tool calling (SQLite order tracking).
+### 🤖 Customer Support Agent (Task 1)
+* **Agentic Tool Calling:** Uses a LangGraph ReAct loop to autonomously decide when to query databases versus searching policy documents.
+* **Real-time Order Tracking:** Directly queries a local SQLite database to retrieve and format complex order statuses and histories.
+* **RAG-powered Policy Answers:** Retrieves exact policy details (shipping, returns, warranty) from a persistent ChromaDB vector store.
+* **Intelligent Escalation:** Automatically detects legal threats, intense anger, or out-of-scope requests and logs them to a human-review ticket system.
 
 ## 🛠️ Tech Stack
 
-* **UI:** Streamlit (Multi-page app with modern layouts)
-* **LLM Provider:** Google GenAI SDK (`google-genai`)
-* **Vision Model:** Gemini 2.5 Pro (Configured with low temperature for strict factual extraction)
-* **Text Model:** Gemini 2.5 Flash
-* **Banner Generation:** Pollinations.ai API + Pillow (PIL) for compositing
-* **Concurrency:** Python `concurrent.futures` for parallel asset generation
+* **UI:** Streamlit (`>=1.57.0`)
+* **LLM Integration:** Google GenAI SDK (`google-genai>=2.2.0`), Langchain (`>=1.3.0`)
+* **Agent Framework:** LangGraph (`>=1.1.10`)
+* **Vector Store:** ChromaDB (`>=1.5.9`)
+* **Embeddings:** HuggingFace `sentence-transformers/all-MiniLM-L6-v2` (`>=5.4.1`)
+* **Image Processing:** Pillow (`>=12.2.0`)
+* **Database:** SQLite (Python standard library)
 
-## 🏗️ Architecture (Content Generator)
-1. **Upload:** User uploads an image via the Streamlit UI.
-2. **Analysis:** The image is sent to Gemini 2.5 Pro with a strict JSON schema to extract product attributes.
-3. **Parallel Generation:** 
-   * The extracted attributes are sent to Gemini 2.5 Flash to generate marketing text.
-   * Simultaneously, a dynamic prompt is built and sent to an image generation API, followed by a Pillow script adding the product title as an overlay.
-4. **Presentation:** Results are displayed in a clean, tabbed Streamlit interface with 1-click copy buttons and metric dashboards.
+## 🏗️ Architecture
 
-## 🚀 How to Run the Project
+**Content Generator (Module 1):** The pipeline is triggered by an image upload. We utilize `gemini-2.5-pro` with a strict JSON schema to perform a highly factual visual analysis of the product. The resulting JSON attributes are then passed into `gemini-2.5-flash` to draft the SEO and marketing copy. Simultaneously, a dynamic prompt is built from those visual attributes and sent to the Pollinations.ai image generation API. We use Python's `concurrent.futures` to run the text generation and image generation in parallel. Finally, Pillow (PIL) is used to composite the generated product title over the banner image.
 
-Follow these steps to run the application on your local machine:
+**Customer Support Agent (Module 2):** This module relies on a LangGraph ReAct (Reasoning and Acting) architecture powered by `gemini-2.5-flash`. The agent is given access to three distinct tools: a SQL querying tool (`get_order_status`), a RAG semantic search tool (`search_knowledge_base`), and a ticketing tool (`escalate_to_human`). When a user sends a message, the LLM enters a loop where it reasons about the user's intent, executes the necessary tools (often chaining them together, like looking up an order *then* checking the return policy), and finally synthesizes the tool outputs into a conversational response.
 
-### 1. Prerequisites
-Make sure you have Python 3.11+ installed.
+## 🚀 Setup
 
-### 2. Clone and Setup Environment
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/thepratyushranjan/CommerceTwinAI.git
 cd ai-assistant-platform
 
 # Create and activate a virtual environment
@@ -52,50 +48,81 @@ source venv/bin/activate  # On Windows use: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
-```
 
-### 3. Environment Variables
-Copy the example environment file and add your Google Gemini API key. You can get a free key from [Google AI Studio](https://aistudio.google.com).
-```bash
+# Configure environment variables
 cp .env.example .env
-```
-Open `.env` and set your key:
-```env
-GOOGLE_API_KEY=your_gemini_api_key_here
-```
+# Edit .env and add your GOOGLE_API_KEY
 
-### 4. Run the Application
-```bash
+# Initialize databases
+python scripts/seed_orders.py
+python scripts/ingest_docs.py
+
+# Run the application
 streamlit run app.py
 ```
-*The application will open automatically in your default web browser at `http://localhost:8501`.*
+
+## 🎥 Demo
+
+*(Add link to 60-90 second Loom/YouTube demo here)*
+[Watch the Demo Video]()
 
 ## 📂 Project Structure
 
 ```text
 ai-assistant-platform/
-├── app.py                              # Main Streamlit landing page
+├── app.py                              # Platform landing page
 ├── pages/
-│   ├── 1_Content_Generator.py          # ✅ Task 2: Content Gen UI
-│   └── 2_Customer_Support.py           # ⏳ Task 1: Support UI (Pending)
+│   ├── 1_Content_Generator.py          # Content Gen UI
+│   └── 2_Customer_Support.py           # Customer Support UI
 ├── modules/
-│   ├── content/                        # Content Generator Backend
+│   ├── content/                        
 │   │   ├── banner.py                   # Image generation & PIL overlay
 │   │   ├── text_gen.py                 # Marketing copy generation
 │   │   └── vision.py                   # Multimodal attribute extraction
-├── prompts/                            # System prompts & strict JSON schemas
-│   ├── text_gen_schema.json
-│   └── vision_schema.json
+│   └── support/                        
+│       ├── agent.py                    # LangGraph ReAct setup
+│       └── tools.py                    # SQLite, ChromaDB, Escalation tools
+├── data/
+│   ├── orders.db                       # SQLite Database (generated)
+│   ├── docs/                           # FAQ Markdown files
+│   └── chromadb/                       # Vector embeddings (generated)
+├── scripts/
+│   ├── seed_orders.py                  # Database seeder
+│   └── ingest_docs.py                  # RAG ingestion script
 ├── shared/
-│   ├── config.py                       # Environment validation
-│   └── llm_client.py                   # Centralized Gemini GenAI client
-├── requirements.txt
+│   ├── llm_client.py                   # Unified Gemini client config
+│   └── config.py                       # Environment loader
 └── README.md
 ```
 
+## 💬 Sample Queries (Customer Support)
+
+Test the agent's reasoning capabilities with these queries:
+
+1. **Order Lookup:** *"Where is my order ORD-1005?"* (Expected: Calls `get_order_status`, returns pending/shipped details).
+2. **Policy RAG:** *"What is your return policy?"* (Expected: Calls `search_knowledge_base`, cites the 30-day window).
+3. **Multi-Tool Reasoning:** *"I want to return ORD-1003, what's your policy?"* (Expected: Calls BOTH `get_order_status` to check the order, and `search_knowledge_base` to check the rules).
+4. **Out of Scope:** *"What is the weather today?"* (Expected: Politely declines, no tools called).
+5. **Implicit Escalation:** *"I'm going to sue you, my package never arrived!"* (Expected: Detects threat, calls `escalate_to_human`, returns a TKT ID).
+
 ## 🧠 Design Decisions
 
-* **Modern SDK & Strict Typing:** Migrated to the latest `google-genai` SDK to utilize native `response_schema` parameters. This guarantees the LLM outputs strict JSON, eliminating brittle string parsing and formatting errors.
-* **Intelligent Fallbacks:** The Vision module is configured with exponential backoffs and automatic model switching (from Pro to Flash) to gracefully handle API rate limits and "503 Deadline Exceeded" errors common with heavy image processing.
-* **Parallel Processing:** Text generation and banner generation execute concurrently via `ThreadPoolExecutor`, effectively cutting the user wait time in half.
-* **UX/UI Polish:** Implemented `st.tabs`, metrics blocks, and clean code blocks in Streamlit to transform raw data outputs into a professional, dashboard-like experience.
+**Why a single ReAct agent with tools instead of multi-agent?**
+For this specific scope (order tracking and FAQ retrieval), a single ReAct loop is significantly faster, easier to debug, and less prone to infinite loops than a multi-agent system (like AutoGen or CrewAI). A single agent with well-defined docstrings on its tools is highly effective at routing basic e-commerce intents without the overhead of inter-agent communication.
+
+**Why ChromaDB over Pinecone for this assessment?**
+ChromaDB was chosen to strictly adhere to the "Zero Docker/Zero external infrastructure" requirement. Because it runs embedded in Python via SQLite and Parquet, it allows evaluators to run the setup scripts and immediately test the RAG functionality without needing to sign up for cloud API keys or configure network access policies.
+
+**Why Gemini over OpenAI?**
+The Gemini API provides an incredible developer experience for this specific assessment. Gemini 2.5 Pro offers native, high-quality multimodal vision out-of-the-box, which was critical for Task 2. Furthermore, the new `google-genai` SDK allows us to pass Pydantic schemas directly into the generation config, ensuring perfect JSON structured outputs without relying on brittle third-party parsers like LangChain's OutputParsers.
+
+**How structured JSON outputs reduce hallucination in the Vision module.**
+By forcing the vision model to adhere to a strict JSON schema (e.g., `primary_color_hex`, `materials` array), we constrain its generation space. It stops the model from hallucinating poetic but useless descriptions (e.g., "A beautiful, ethereal shoe") and forces it into an analytical state ("Material: Leather, Color: #FFFFFF"), which directly improves the quality of the downstream marketing copy.
+
+## 🔮 What I'd Add With More Time
+
+* **Streaming UI for Content Generation:** Instead of spinners, stream the text copy into the UI chunk-by-chunk so the user feels immediate progress while waiting on the image generation API.
+* **pgvector Migration:** Move from local SQLite/Chroma to PostgreSQL with `pgvector` so relational order data and vector FAQ data live in the same unified database.
+* **Human-in-the-Loop Escalation UI:** Build a third Streamlit page for "Support Managers" to view and resolve the tickets generated in `tickets.json`.
+* **Dynamic Tool Selection:** Implement an embedding-based tool retriever for the agent. If the toolset grows to 50+ tools, passing all of them in the prompt becomes too expensive.
+* **User Authentication:** Add session state login so users don't have to type their email or Order ID; the agent would automatically know who they are via context.
