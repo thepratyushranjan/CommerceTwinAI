@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project Specific Data
+data/orders.db
+data/chromadb/
+data/tickets.json
+data/test_banner.png

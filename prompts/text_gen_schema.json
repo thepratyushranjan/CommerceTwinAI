@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "required": ["title", "description", "features", "seo_keywords", "hashtags", "instagram_caption", "twitter_caption"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Product title under 70 characters, SEO-friendly"
+    },
+    "description": {
+      "type": "string",
+      "description": "Product description 150-250 words, engaging and benefit-focused"
+    },
+    "features": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Exactly 5 feature bullet points"
+    },
+    "seo_keywords": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "10 SEO keywords: 5 head terms and 5 long-tail variations"
+    },
+    "hashtags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "10 hashtags without # symbol, lowercase, no spaces"
+    },
+    "instagram_caption": {
+      "type": "string",
+      "description": "Instagram caption 150-300 chars with hashtags at the end"
+    },
+    "twitter_caption": {
+      "type": "string",
+      "description": "Twitter/X caption under 280 characters total including hashtags"
+    }
+  }
+}

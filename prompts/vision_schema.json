@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "required": ["category", "subcategory", "primary_color_hex", "materials", "style_adjectives", "target_audience", "distinctive_features", "use_cases"],
+  "properties": {
+    "category": {
+      "type": "string",
+      "description": "Top-level product category (e.g., footwear, home decor, electronics)"
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "More specific category (e.g., running shoes, scented candles, wireless earbuds)"
+    },
+    "primary_color_hex": {
+      "type": "string",
+      "description": "Dominant color in hex format like #FF5733"
+    },
+    "secondary_color_hex": {
+      "type": "string",
+      "description": "Second most prominent color in hex format"
+    },
+    "materials": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Visible materials e.g. leather, cotton, brushed aluminum"
+    },
+    "style_adjectives": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "3-5 style descriptors e.g. minimalist, rustic, modern, vintage"
+    },
+    "target_audience": {
+      "type": "string",
+      "description": "Likely target demographic in one phrase"
+    },
+    "distinctive_features": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "3-5 visible distinguishing features"
+    },
+    "use_cases": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "3-4 typical use cases for this product"
+    }
+  }
+}
