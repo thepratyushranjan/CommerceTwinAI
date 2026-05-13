@@ -2,8 +2,87 @@
 
 An integrated, multimodal AI suite that empowers sellers with instant, high-converting marketing content and provides customers with an intelligent, agentic support experience.
 
-*(Note: Architecture diagram and Demo video placeholders below. Please add screenshots to `/assets/` before submission)*
-![Architecture Diagram](assets/architecture_diagram.png)
+## 🧭 Architecture Diagram
+
+```mermaid
+flowchart TB
+    User([👤 User]):::user
+
+    subgraph UI["🖥️ Streamlit UI (app.py)"]
+        Page1["📸 Content Generator Page"]
+        Page2["🤖 Customer Support Page"]
+    end
+
+    subgraph M1["📦 Module 1 — Content Generator"]
+        direction TB
+        Vision["vision.py<br/>Multimodal Attribute Extraction<br/>(Structured JSON Schema)"]
+        TextGen["text_gen.py<br/>SEO + Marketing Copy"]
+        Banner["banner.py<br/>Banner Render + PIL Overlay"]
+        Parallel{{"concurrent.futures<br/>Parallel Execution"}}
+    end
+
+    subgraph M2["🛠️ Module 2 — Customer Support Agent"]
+        direction TB
+        Agent["agent.py<br/>LangGraph ReAct Loop"]
+        Tools["tools.py"]
+        T1["🔍 get_order_status"]
+        T2["📚 search_knowledge_base"]
+        T3["🚨 escalate_to_human"]
+    end
+
+    subgraph Shared["⚙️ Shared Layer"]
+        LLM["shared/llm_client.py<br/>Gemini Client"]
+        Cfg["shared/config.py<br/>Env Loader"]
+    end
+
+    subgraph Data["💾 Data & External Services"]
+        Gemini[("Google Gemini API")]
+        Pollinations[("Pollinations.ai<br/>Image Gen API")]
+        SQLite[("SQLite<br/>data/orders.db")]
+        Chroma[("ChromaDB<br/>data/chromadb/")]
+        Tickets[("tickets.json")]
+        HF["HuggingFace<br/>all-MiniLM-L6-v2"]
+    end
+
+    User --> Page1 & Page2
+
+    Page1 --> Vision
+    Vision --> Parallel
+    Parallel --> TextGen
+    Parallel --> Banner
+    TextGen --> Page1
+    Banner --> Page1
+
+    Page2 --> Agent
+    Agent <--> Tools
+    Tools --> T1 --> SQLite
+    Tools --> T2 --> Chroma
+    Tools --> T3 --> Tickets
+    Chroma -.embeds via.-> HF
+    Agent --> Page2
+
+    Vision -.uses.-> LLM
+    TextGen -.uses.-> LLM
+    Agent -.uses.-> LLM
+    LLM --> Gemini
+    Banner --> Pollinations
+    LLM -.reads.-> Cfg
+
+    classDef user fill:#fef3c7,stroke:#d97706,color:#000
+    classDef ui fill:#dbeafe,stroke:#2563eb,color:#000
+    classDef mod fill:#dcfce7,stroke:#16a34a,color:#000
+    classDef shared fill:#f3e8ff,stroke:#9333ea,color:#000
+    classDef data fill:#fee2e2,stroke:#dc2626,color:#000
+
+    class Page1,Page2 ui
+    class Vision,TextGen,Banner,Parallel,Agent,Tools,T1,T2,T3 mod
+    class LLM,Cfg shared
+    class Gemini,Pollinations,SQLite,Chroma,Tickets,HF data
+```
+
+**Flow summary:**
+- **Module 1:** Image upload → Gemini Vision (structured JSON) → parallel branches: (a) Gemini text generation for SEO copy, (b) Pollinations.ai banner render with PIL overlay.
+- **Module 2:** User message → LangGraph ReAct agent (Gemini) reasons over three tools — SQLite order lookup, ChromaDB RAG over policy docs, and escalation ticketing — chaining them as needed before responding.
 
 ## ✨ Features
 
